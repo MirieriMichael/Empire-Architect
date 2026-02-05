@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empire Architect | AI-Powered Business Intelligence</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --accent: #f72585;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --danger: #f94144;
+            
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #334155;
+            --border: #475569;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            
+            --gradient-primary: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+            --gradient-secondary: linear-gradient(135deg, #7209b7 0%, #560bad 100%);
+            --gradient-accent: linear-gradient(135deg, #f72585 0%, #b5179e 100%);
+            --gradient-card: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+            
+            --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+            --shadow-glow: 0 0 20px rgba(67, 97, 238, 0.3);
+            
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --radius-full: 9999px;
+        }
+
+        * {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Modern Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-full);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: var(--radius-full);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        @keyframes glow {
+            from { box-shadow: 0 0 10px var(--glow-color, var(--primary)), 0 0 20px var(--glow-color, var(--primary)); }
+            to { box-shadow: 0 0 20px var(--glow-color, var(--primary)), 0 0 30px var(--glow-color, var(--primary)); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .animate-slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .animate-pulse {
+            animation: pulse 2s infinite;
+        }
+
+        .glow-effect {
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        .shimmer {
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+
+        /* Typing Indicator */
+        .typing-indicator span {
+            animation: blink 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes blink {
+            0%, 80%, 100% { opacity: 0; }
+            40% { opacity: 1; }
+        }
+
+        /* Heat Map Cells */
+        .heat-map-cell {
+            transition: all 0.3s ease;
+        }
+
+        .heat-map-cell:hover {
+            transform: scale(1.1);
+            z-index: 10;
+        }
+
+        /* Chat Messages */
+        .chat-message {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Progress Rings */
+        .progress-ring {
+            transition: stroke-dashoffset 0.5s ease;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    
+    <!-- Authentication Overlay -->
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4 relative">
+        <!-- Background Gradient -->
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-pink-900/20"></div>
+        
+        <!-- Particle Effect -->
+        <div class="absolute inset-0 overflow-hidden">
+            <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
+        </div>
+
+        <div class="relative z-10 text-center max-w-md w-full">
+            <!-- Logo & Brand -->
+            <div class="mb-12">
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl mb-6 shadow-2xl">
+                    <i class="fas fa-chess-queen text-3xl text-white"></i>
+                </div>
+                <h1 class="text-5xl font-extrabold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-3">
+                    EMPIRE ARCHITECT
+                </h1>
+                <p class="text-gray-400 text-lg">
+                    AI-Powered Business Intelligence Platform
+                </p>
+            </div>
+            
+            <!-- Login Card -->
+            <div class="bg-gradient-to-b from-gray-900/90 to-gray-900/50 backdrop-blur-xl rounded-2xl p-8 border border-gray-800 shadow-2xl animate-fade-in">
+                <h2 class="text-2xl font-bold mb-2">Launch Your Business Intelligence</h2>
+                <p class="text-gray-400 mb-6">Secure login with advanced neural verification</p>
+                
+                <!-- Biometric Scanner -->
+                <div class="relative w-48 h-48 mx-auto mb-8">
+                    <div class="absolute inset-0 border-4 border-blue-500/30 rounded-full animate-pulse"></div>
+                    <div class="absolute inset-8 border-4 border-purple-500/30 rounded-full animate-pulse" style="animation-delay: 0.2s"></div>
+                    <div class="absolute inset-16 border-4 border-pink-500/30 rounded-full animate-pulse" style="animation-delay: 0.4s"></div>
+                    
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-2xl">
+                            <i class="fas fa-fingerprint text-3xl text-white"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent animate-pulse"></div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="space-y-4">
+                    <button id="googleSignIn" class="w-full bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 rounded-xl p-4 font-semibold transition-all duration-300 flex items-center justify-center gap-3 group">
+                        <svg class="w-6 h-6" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        Continue with Google
+                    </button>
+
+                    <div class="relative my-6">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-800"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-4 bg-gray-900/50 text-gray-400 backdrop-blur-sm">or quick demo</span>
+                        </div>
+                    </div>
+
+                    <button id="demoLogin" class="w-full bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 rounded-xl p-4 font-semibold transition-all duration-300 shadow-lg hover:shadow-xl">
+                        Enter Neural Demo Mode
+                    </button>
+                </div>
+            </div>
+
+            <p class="mt-8 text-gray-500 text-sm">
+                <i class="fas fa-shield-alt mr-2"></i>
+                Enterprise-grade security • Auto-save intelligence • Real-time AI analysis
+            </p>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboard" class="hidden">
+        <!-- Top Navigation -->
+        <nav class="sticky top-0 z-50 bg-gray-900/80 backdrop-blur-xl border-b border-gray-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <!-- Left: Brand & User -->
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                                <i class="fas fa-crown text-white"></i>
+                            </div>
+                            <div>
+                                <h1 class="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent" id="empireName">
+                                    EMPIRE ARCHITECT
+                                </h1>
+                                <p class="text-xs text-gray-400" id="codenameDisplay">@strategist</p>
+                            </div>
+                        </div>
+                        
+                        <div class="hidden md:flex items-center gap-6 ml-8">
+                            <div class="flex items-center gap-2 px-3 py-2 bg-gray-800/50 rounded-lg">
+                                <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                <span class="text-sm text-gray-300">Neural Link Active</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Actions -->
+                    <div class="flex items-center gap-3">
+                        <!-- Color Picker -->
+                        <div class="relative group">
+                            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center cursor-pointer hover:opacity-90 transition">
+                                <i class="fas fa-palette text-white"></i>
+                            </div>
+                            <div class="absolute top-full right-0 mt-2 bg-gray-900 border border-gray-800 rounded-xl p-4 shadow-2xl hidden group-hover:block">
+                                <p class="text-sm font-semibold mb-2">Theme Color</p>
+                                <input type="color" id="glowColorPicker" value="#4361ee" class="w-32 h-10 rounded cursor-pointer">
+                            </div>
+                        </div>
+
+                        <!-- Settings -->
+                        <button id="settingsBtn" class="w-10 h-10 flex items-center justify-center bg-gray-800/50 hover:bg-gray-800 rounded-lg transition">
+                            <i class="fas fa-cog text-gray-300"></i>
+                        </button>
+
+                        <!-- User Profile -->
+                        <div class="flex items-center gap-3 px-4 py-2 bg-gray-800/50 rounded-xl cursor-pointer hover:bg-gray-800 transition">
+                            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center font-semibold text-white" id="userAvatar">
+                                S
+                            </div>
+                            <div class="hidden md:block">
+                                <p class="text-sm font-semibold" id="userName">Strategist</p>
+                                <p class="text-xs text-gray-400">Business Architect</p>
+                            </div>
+                            <i class="fas fa-chevron-down text-gray-400 text-sm"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Welcome & Industry Selector -->
+            <div class="mb-8 animate-fade-in">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h2 class="text-3xl font-bold mb-2" id="welcomeMessage">Welcome back, Strategist</h2>
+                        <p class="text-gray-400">Real-time business intelligence for <span class="font-semibold text-blue-400" id="currentIndustry">Technology</span> industry</p>
+                    </div>
+                    <button class="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-xl font-semibold transition shadow-lg hover:shadow-xl">
+                        <i class="fas fa-rocket mr-2"></i>
+                        Generate Strategy Report
+                    </button>
+                </div>
+
+                <!-- Industry Grid -->
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3" id="industrySelector">
+                    <!-- Dynamic industries will load here -->
+                </div>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" id="statsOverview">
+                <!-- Dynamic stats cards will load here -->
+            </div>
+
+            <!-- Main Dashboard Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left: Analytics (2/3 width) -->
+                <div class="lg:col-span-2 space-y-8">
+                    <!-- Growth Velocity Chart -->
+                    <div class="bg-gradient-to-b from-gray-900/90 to-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-800 p-6 shadow-xl transition hover:border-blue-500/50">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                            <div>
+                                <h3 class="text-xl font-bold flex items-center gap-2">
+                                    <i class="fas fa-tachometer-alt text-blue-400"></i>
+                                    Growth Velocity
+                                </h3>
+                                <p class="text-sm text-gray-400 mt-1">Real-time market performance metrics</p>
+                            </div>
+                            <select id="velocityTimeframe" class="bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-500">
+                                <option value="7">7 Days</option>
+                                <option value="30" selected>30 Days</option>
+                                <option value="90">90 Days</option>
+                                <option value="365">1 Year</option>
+                            </select>
+                        </div>
+                        <canvas id="velocityChart" height="120"></canvas>
+                    </div>
+
+                    <!-- Market Intelligence Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Heat Map -->
+                        <div class="bg-gradient-to-b from-gray-900/90 to-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-800 p-6 shadow-xl transition hover:border-purple-500/50">
+                            <div class="flex items-center justify-between mb-6">
+                                <div>
+                                    <h3 class="text-xl font-bold flex items-center gap-2">
+                                        <i class="fas fa-fire text-orange-400"></i>
+                                        Market Heat Map
+                                    </h3>
+                                    <p class="text-sm text-gray-400 mt-1">Opportunity intensity across segments</p>
+                                </div>
+                                <div class="flex gap-2 text-xs">
+                                    <span class="flex items-center gap-1 px-2 py-1 bg-blue-500/20 rounded">
+                                        <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                        Low
+                                    </span>
+                                    <span class="flex items-center gap-1 px-2 py-1 bg-yellow-500/20 rounded">
+                                        <div class="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                                        Med
+                                    </span>
+                                    <span class="flex items-center gap-1 px-2 py-1 bg-red-500/20 rounded">
+                                        <div class="w-2 h-2 bg-red-500 rounded-full"></div>
+                                        High
+                                    </span>
+                                </div>
+                            </div>
+                            <div id="heatMap" class="grid grid-cols-7 gap-1.5">
+                                <!-- Dynamic heat map cells -->
+                            </div>
+                        </div>
+
+                        <!-- Risk Assessment -->
+                        <div class="bg-gradient-to-b from-gray-900/90 to-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-800 p-6 shadow-xl transition hover:border-red-500/50">
+                            <h3 class="text-xl font-bold flex items-center gap-2 mb-6">
+                                <i class="fas fa-shield-alt text-red-400"></i>
+                                Risk Assessment
+                            </h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-sm font-medium">Competition</span>
+                                        <span class="text-sm font-semibold">75%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+                                        <div class="h-full bg-gradient-to-r from-red-500 to-orange-500 rounded-full transition-all duration-1000" style="width: 75%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-sm font-medium">Regulatory</span>
+                                        <span class="text-sm font-semibold">60%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+                                        <div class="h-full bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full transition-all duration-1000" style="width: 60%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-sm font-medium">Technology</span>
+                                        <span class="text-sm font-semibold">40%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+                                        <div class="h-full bg-gradient-to-r from-green-500 to-emerald-500 rounded-full transition-all duration-1000" style="width: 40%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-sm font-medium">Market Fit</span>
+                                        <span class="text-sm font-semibold">85%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+                                        <div class="h-full bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full transition-all duration-1000" style="width: 85%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Business Plan Progress -->
+                    <div class="bg-gradient-to-b from-gray-900/90 to-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-800 p-6 shadow-xl transition hover:border-green-500/50">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h3 class="text-xl font-bold flex items-center gap-2">
+                                    <i class="fas fa-project-diagram text-green-400"></i>
+                                    Business Plan Progress
+                                </h3>
+                                <p class="text-sm text-gray-400 mt-1">Strategic development completion</p>
+                            </div>
+                            <div class="text-2xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
+                                68%
+                            </div>
+                        </div>
+                        <div class="space-y-4" id="businessPlanProgress">
+                            <!-- Dynamic progress items -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: AI Strategist (1/3 width) -->
+                <div class="lg:col-span-1">
+                    <div class="bg-gradient-to-b from-gray-900/90 to-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-800 flex flex-col shadow-xl sticky top-24" style="height: calc(100vh - 120px);">
+                        <!-- AI Header -->
+                        <div class="p-6 border-b border-gray-800">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                                    <i class="fas fa-brain text-white text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold">Neural Strategist</h3>
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                        <p class="text-xs text-gray-400">Elite AI • Online</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chat Messages -->
+                        <div id="chatMessages" class="flex-1 overflow-y-auto p-6 space-y-4">
+                            <!-- Welcome Message -->
+                            <div class="chat-message bg-gray-800/50 rounded-xl p-4 border border-gray-700/50">
+                                <div class="flex items-start gap-2 mb-3">
+                                    <div class="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-brain text-white text-xs"></i>
+                                    </div>
+                                    <span class="text-xs font-semibold text-gray-300">Neural Strategist</span>
+                                </div>
+                                <p class="text-sm text-gray-200">Welcome to your business intelligence hub! I'm your AI strategist, equipped with real-time market data for <span class="font-semibold" id="chatEmpireName">your empire</span>. I can help you with:</p>
+                                <ul class="text-sm mt-3 space-y-2 text-gray-300">
+                                    <li class="flex items-center gap-2">
+                                        <i class="fas fa-chart-line text-blue-400 text-xs"></i>
+                                        <span>Market analysis & strategy</span>
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <i class="fas fa-file-contract text-purple-400 text-xs"></i>
+                                        <span>Registration guidance</span>
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <i class="fas fa-money-bill-wave text-green-400 text-xs"></i>
+                                        <span>Financial projections</span>
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <i class="fas fa-rocket text-pink-400 text-xs"></i>
+                                        <span>Growth tactics</span>
+                                    </li>
+                                </ul>
+                                <p class="text-sm mt-3 text-gray-400">What would you like to explore?</p>
+                            </div>
+                        </div>
+
+                        <!-- Chat Input -->
+                        <div class="p-4 border-t border-gray-800">
+                            <div class="flex gap-2 mb-3">
+                                <input 
+                                    type="text" 
+                                    id="chatInput" 
+                                    placeholder="Ask your AI strategist..."
+                                    class="flex-1 bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 transition"
+                                />
+                                <button id="chatSend" class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 rounded-xl flex items-center justify-center transition shadow-lg hover:shadow-xl">
+                                    <i class="fas fa-paper-plane text-white"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Quick Prompts -->
+                            <div class="flex gap-2 flex-wrap">
+                                <button class="quick-prompt text-xs bg-gray-800/50 hover:bg-gray-800 border border-gray-700 rounded-full px-3 py-1.5 transition hover:border-blue-500/50">
+                                    <i class="fas fa-lightbulb mr-1 text-yellow-400"></i>
+                                    Business ideas
+                                </button>
+                                <button class="quick-prompt text-xs bg-gray-800/50 hover:bg-gray-800 border border-gray-700 rounded-full px-3 py-1.5 transition hover:border-blue-500/50">
+                                    <i class="fas fa-chart-bar mr-1 text-blue-400"></i>
+                                    Market size
+                                </button>
+                                <button class="quick-prompt text-xs bg-gray-800/50 hover:bg-gray-800 border border-gray-700 rounded-full px-3 py-1.5 transition hover:border-blue-500/50">
+                                    <i class="fas fa-users mr-1 text-green-400"></i>
+                                    Target audience
+                                </button>
+                                <button class="quick-prompt text-xs bg-gray-800/50 hover:bg-gray-800 border border-gray-700 rounded-full px-3 py-1.5 transition hover:border-blue-500/50">
+                                    <i class="fas fa-file-invoice-dollar mr-1 text-purple-400"></i>
+                                    Funding
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div class="bg-gradient-to-b from-gray-900 to-gray-900/95 backdrop-blur-xl rounded-2xl border border-gray-800 p-8 max-w-md w-full shadow-2xl animate-fade-in">
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-2xl font-bold flex items-center gap-2">
+                    <i class="fas fa-sliders-h text-blue-400"></i>
+                    Empire Configuration
+                </h2>
+                <button id="closeSettings" class="w-10 h-10 flex items-center justify-center hover:bg-gray-800 rounded-xl transition">
+                    <i class="fas fa-times text-gray-400"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-6">
+                <!-- Codename -->
+                <div>
+                    <label class="block text-sm font-semibold mb-2 text-gray-300">
+                        <i class="fas fa-user-secret mr-2 text-blue-400"></i>
+                        Your Codename
+                    </label>
+                    <input 
+                        type="text" 
+                        id="codenameInput" 
+                        placeholder="e.g., Maverick, Phoenix, Titan..."
+                        class="w-full bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 transition"
+                    />
+                </div>
+
+                <!-- Empire Name -->
+                <div>
+                    <label class="block text-sm font-semibold mb-2 text-gray-300">
+                        <i class="fas fa-crown mr-2 text-purple-400"></i>
+                        Empire Name
+                    </label>
+                    <input 
+                        type="text" 
+                        id="empireNameInput" 
+                        placeholder="e.g., Quantum Innovations, GreenFuture..."
+                        class="w-full bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 transition"
+                    />
+                </div>
+
+                <!-- Primary Industry -->
+                <div>
+                    <label class="block text-sm font-semibold mb-2 text-gray-300">
+                        <i class="fas fa-industry mr-2 text-green-400"></i>
+                        Primary Industry
+                    </label>
+                    <select id="primaryIndustrySelect" class="w-full bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 transition appearance-none">
+                        <option value="">Select Industry Focus</option>
+                    </select>
+                </div>
+
+                <!-- Business Stage -->
+                <div>
+                    <label class="block text-sm font-semibold mb-2 text-gray-300">
+                        <i class="fas fa-chart-line mr-2 text-yellow-400"></i>
+                        Business Stage
+                    </label>
+                    <select id="businessStageSelect" class="w-full bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-500 transition appearance-none">
+                        <option value="idea">🚀 Idea Stage</option>
+                        <option value="planning">📋 Planning</option>
+                        <option value="startup">💡 Startup</option>
+                        <option value="growth">📈 Growth</option>
+                        <option value="established">🏢 Established</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-3 mt-8">
+                <button id="saveSettings" class="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-xl py-3.5 font-semibold transition shadow-lg hover:shadow-xl">
+                    <i class="fas fa-save mr-2"></i>
+                    Save Configuration
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div id="successToast" class="hidden fixed bottom-4 right-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-xl shadow-2xl animate-fade-in z-50">
+        <div class="flex items-center gap-3">
+            <i class="fas fa-check-circle"></i>
+            <span class="font-semibold" id="toastMessage">Settings saved successfully!</span>
+        </div>
+    </div>
+
+    <script>
+        // ========================================
+        // MODERN STATE MANAGEMENT
+        // ========================================
+        
+        const EmpireState = {
+            user: null,
+            empire: {
+                codename: 'Strategist',
+                empireName: 'Empire Architect',
+                industry: 'technology',
+                stage: 'idea',
+                glowColor: '#4361ee',
+                lastUpdated: new Date().toISOString()
+            },
+            
+            industries: [
+                { id: 'technology', name: 'Technology', icon: '💻', color: '#4361ee', gradient: 'from-blue-500 to-cyan-500' },
+                { id: 'retail', name: 'Retail', icon: '🛍️', color: '#10b981', gradient: 'from-emerald-500 to-green-500' },
+                { id: 'food', name: 'Food & Beverage', icon: '🍔', color: '#f59e0b', gradient: 'from-amber-500 to-yellow-500' },
+                { id: 'health', name: 'Healthcare', icon: '🏥', color: '#ef4444', gradient: 'from-red-500 to-pink-500' },
+                { id: 'finance', name: 'Finance', icon: '💰', color: '#8b5cf6', gradient: 'from-purple-500 to-violet-500' },
+                { id: 'education', name: 'Education', icon: '📚', color: '#06b6d4', gradient: 'from-cyan-500 to-blue-500' },
+                { id: 'real-estate', name: 'Real Estate', icon: '🏠', color: '#ec4899', gradient: 'from-pink-500 to-rose-500' },
+                { id: 'manufacturing', name: 'Manufacturing', icon: '🏭', color: '#6366f1', gradient: 'from-indigo-500 to-purple-500' },
+                { id: 'agriculture', name: 'Agriculture', icon: '🌾', color: '#84cc16', gradient: 'from-lime-500 to-green-500' },
+                { id: 'energy', name: 'Energy', icon: '⚡', color: '#eab308', gradient: 'from-yellow-500 to-amber-500' },
+                { id: 'transport', name: 'Transport', icon: '🚚', color: '#14b8a6', gradient: 'from-teal-500 to-emerald-500' },
+                { id: 'entertainment', name: 'Entertainment', icon: '🎬', color: '#f97316', gradient: 'from-orange-500 to-red-500' }
+            ],
+            
+            intelligence: {},
+            charts: {},
+            chatHistory: [],
+            
+            // Initialize with saved data
+            init() {
+                const saved = localStorage.getItem('empireArchitect_data');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    this.empire = { ...this.empire, ...data.empire };
+                    console.log('📁 Loaded saved intelligence data');
+                }
+                
+                // Generate intelligence for all industries
+                this.industries.forEach(industry => {
+                    this.intelligence[industry.id] = this.generateIntelligence(industry.id);
+                });
+            },
+            
+            generateIntelligence(industryId) {
+                const baseData = {
+                    technology: { growth: 18, competition: 85, opportunity: 92, risk: 65 },
+                    retail: { growth: 8, competition: 75, opportunity: 65, risk: 70 },
+                    food: { growth: 12, competition: 80, opportunity: 70, risk: 75 },
+                    health: { growth: 22, competition: 70, opportunity: 95, risk: 55 },
+                    finance: { growth: 15, competition: 90, opportunity: 75, risk: 80 },
+                    education: { growth: 14, competition: 65, opportunity: 85, risk: 60 },
+                    'real-estate': { growth: 6, competition: 85, opportunity: 60, risk: 85 },
+                    manufacturing: { growth: 7, competition: 75, opportunity: 65, risk: 70 },
+                    agriculture: { growth: 9, competition: 60, opportunity: 70, risk: 65 },
+                    energy: { growth: 25, competition: 80, opportunity: 90, risk: 60 },
+                    transport: { growth: 11, competition: 78, opportunity: 72, risk: 68 },
+                    entertainment: { growth: 16, competition: 88, opportunity: 80, risk: 72 }
+                };
+                
+                const base = baseData[industryId] || baseData.technology;
+                
+                // Generate advanced intelligence data
+                return {
+                    stats: {
+                        marketSize: `$${(75 + Math.random() * 250).toFixed(1)}B`,
+                        growth: `${base.growth}% YoY`,
+                        competitors: Math.floor(150 + Math.random() * 1200).toLocaleString(),
+                        opportunity: `${base.opportunity}%`,
+                        risk: `${base.risk}%`,
+                        maturity: `${Math.floor(30 + Math.random() * 50)}%`
+                    },
+                    
+                    velocity: Array.from({length: 30}, (_, i) => {
+                        return 1000 + (base.growth * 20) * i + (Math.random() - 0.5) * 200;
+                    }),
+                    
+                    heatMap: Array.from({length: 49}, () => Math.random() * 100),
+                    
+                    businessPlan: {
+                        'Executive Summary': Math.floor(20 + Math.random() * 60),
+                        'Market Analysis': Math.floor(30 + Math.random() * 50),
+                        'Product Strategy': Math.floor(25 + Math.random() * 55),
+                        'Marketing Plan': Math.floor(15 + Math.random() * 65),
+                        'Financial Model': Math.floor(10 + Math.random() * 70),
+                        'Operational Setup': Math.floor(35 + Math.random() * 45)
+                    }
+                };
+            },
+            
+            save() {
+                const data = {
+                    empire: this.empire,
+                    lastSync: new Date().toISOString()
+                };
+                localStorage.setItem('empireArchitect_data', JSON.stringify(data));
+                console.log('💾 Intelligence data saved');
+                
+                // Show success toast
+                showToast('Configuration saved successfully!');
+            }
+        };
+
+        // ========================================
+        // CORE APPLICATION
+        // ========================================
+
+        class EmpireArchitect {
+            constructor() {
+                this.init();
+            }
+            
+            init() {
+                // Initialize state
+                EmpireState.init();
+                
+                // Bind event listeners
+                this.bindEvents();
+                
+                // Set up auto-save
+                this.setupAutoSave();
+                
+                console.log('🚀 Empire Architect initialized');
+            }
+            
+            bindEvents() {
+                // Authentication
+                document.getElementById('googleSignIn').addEventListener('click', this.handleGoogleAuth);
+                document.getElementById('demoLogin').addEventListener('click', this.handleDemoLogin);
+                
+                // Settings
+                document.getElementById('settingsBtn').addEventListener('click', this.openSettings);
+                document.getElementById('closeSettings').addEventListener('click', this.closeSettings);
+                document.getElementById('saveSettings').addEventListener('click', this.saveSettings);
+                
+                // Glow color
+                document.getElementById('glowColorPicker').addEventListener('input', (e) => {
+                    this.applyGlowColor(e.target.value);
+                });
+                
+                // Chat
+                document.getElementById('chatSend').addEventListener('click', this.sendChatMessage);
+                document.getElementById('chatInput').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.sendChatMessage();
+                });
+                
+                // Quick prompts
+                document.querySelectorAll('.quick-prompt').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.getElementById('chatInput').value = btn.textContent.trim();
+                        this.sendChatMessage();
+                    });
+                });
+            }
+            
+            setupAutoSave() {
+                // Auto-save every 30 seconds
+                setInterval(() => {
+                    if (EmpireState.user) EmpireState.save();
+                }, 30000);
+                
+                // Auto-save on unload
+                window.addEventListener('beforeunload', () => EmpireState.save());
+            }
+            
+            handleGoogleAuth() {
+                // In production, implement actual Google OAuth
+                this.simulateLogin('Google Strategist', 'strategist@google.com');
+            }
+            
+            handleDemoLogin() {
+                this.simulateLogin('Neural Strategist', 'demo@empirearchitect.ai');
+            }
+            
+            simulateLogin(name, email) {
+                EmpireState.user = { name, email, avatar: name.charAt(0) };
+                this.showDashboard();
+                console.log('🔐 Neural authentication complete');
+            }
+            
+            showDashboard() {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                this.renderDashboard();
+            }
+            
+            renderDashboard() {
+                // Update UI with empire data
+                document.getElementById('welcomeMessage').textContent = 
+                    `Welcome back, ${EmpireState.empire.codename}`;
+                document.getElementById('codenameDisplay').textContent = 
+                    `@${EmpireState.empire.codename.toLowerCase()}`;
+                document.getElementById('empireName').textContent = 
+                    EmpireState.empire.empireName;
+                document.getElementById('userName').textContent = 
+                    EmpireState.empire.codename;
+                document.getElementById('userAvatar').textContent = 
+                    EmpireState.empire.codename.charAt(0);
+                document.getElementById('chatEmpireName').textContent = 
+                    EmpireState.empire.empireName;
+                
+                // Render components
+                this.renderIndustrySelector();
+                this.updateDashboard();
+                this.applyGlowColor(EmpireState.empire.glowColor);
+            }
+            
+            renderIndustrySelector() {
+                const container = document.getElementById('industrySelector');
+                const currentIndustry = EmpireState.empire.industry;
+                
+                container.innerHTML = EmpireState.industries.map(industry => {
+                    const isActive = industry.id === currentIndustry;
+                    return `
+                        <div class="industry-card ${isActive ? 'active' : ''} cursor-pointer group"
+                             data-industry="${industry.id}"
+                             onclick="app.selectIndustry('${industry.id}')">
+                            <div class="bg-gradient-to-br ${industry.gradient} rounded-xl p-4 text-center border-2 ${isActive ? 'border-white/30' : 'border-transparent'} group-hover:border-white/20 transition-all duration-300">
+                                <div class="text-3xl mb-2 transform group-hover:scale-110 transition-transform">${industry.icon}</div>
+                                <div class="text-sm font-semibold">${industry.name}</div>
+                                <div class="text-xs text-gray-400 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">Click to analyze</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            selectIndustry(industryId) {
+                EmpireState.empire.industry = industryId;
+                EmpireState.save();
+                this.updateDashboard();
+                this.updateActiveIndustry();
+            }
+            
+            updateActiveIndustry() {
+                // Update active industry indicator
+                const industry = EmpireState.industries.find(i => i.id === EmpireState.empire.industry);
+                document.getElementById('currentIndustry').textContent = industry.name;
+                
+                // Update industry selector
+                document.querySelectorAll('.industry-card').forEach(card => {
+                    const isActive = card.dataset.industry === EmpireState.empire.industry;
+                    card.classList.toggle('active', isActive);
+                    const inner = card.querySelector('.bg-gradient-to-br');
+                    inner.classList.toggle('border-white/30', isActive);
+                    inner.classList.toggle('border-transparent', !isActive);
+                });
+            }
+            
+            updateDashboard() {
+                const intelligence = EmpireState.intelligence[EmpireState.empire.industry];
+                
+                // Update stats
+                this.renderStats(intelligence.stats);
+                
+                // Update charts
+                this.renderVelocityChart(intelligence.velocity);
+                
+                // Update heat map
+                this.renderHeatMap(intelligence.heatMap);
+                
+                // Update business plan
+                this.renderBusinessPlan(intelligence.businessPlan);
+                
+                // Update active industry
+                this.updateActiveIndustry();
+            }
+            
+            renderStats(stats) {
+                const container = document.getElementById('statsOverview');
+                const statCards = [
+                    { 
+                        label: 'Market Size', 
+                        value: stats.marketSize, 
+                        icon: 'fas fa-globe',
+                        gradient: 'from-blue-500 to-cyan-500',
+                        change: '+12.5%' 
+                    },
+                    { 
+                        label: 'Growth Rate', 
+                        value: stats.growth, 
+                        icon: 'fas fa-chart-line',
+                        gradient: 'from-emerald-500 to-green-500',
+                        change: '▲ 2.3%' 
+                    },
+                    { 
+                        label: 'Active Competitors', 
+                        value: stats.competitors, 
+                        icon: 'fas fa-users',
+                        gradient: 'from-amber-500 to-yellow-500',
+                        change: '▼ 8%' 
+                    },
+                    { 
+                        label: 'Opportunity Score', 
+                        value: stats.opportunity, 
+                        icon: 'fas fa-bullseye',
+                        gradient: 'from-purple-500 to-pink-500',
+                        change: 'High' 
+                    }
+                ];
+                
+                container.innerHTML = statCards.map(stat => `
+                    <div class="stat-card bg-gradient-to-b from-gray-900/50 to-gray-900/30 backdrop-blur-sm rounded-2xl p-6 border border-gray-800 hover:border-gray-700 transition-all duration-300 hover:transform hover:-translate-y-1">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-gradient-to-br ${stat.gradient} rounded-xl flex items-center justify-center shadow-lg">
+                                <i class="${stat.icon} text-white"></i>
+                            </div>
+                            <span class="text-xs font-semibold px-2 py-1 bg-gray-800/50 rounded-full">
+                                ${stat.change}
+                            </span>
+                        </div>
+                        <div class="text-2xl font-bold mb-1">${stat.value}</div>
+                        <div class="text-sm text-gray-400">${stat.label}</div>
+                    </div>
+                `).join('');
+            }
+            
+            renderVelocityChart(data) {
+                const ctx = document.getElementById('velocityChart');
+                
+                // Destroy existing chart
+                if (EmpireState.charts.velocity) {
+                    EmpireState.charts.velocity.destroy();
+                }
+                
+                const labels = data.map((_, i) => `Day ${i + 1}`);
+                const primaryColor = EmpireState.empire.glowColor;
+                
+                EmpireState.charts.velocity = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Market Trajectory',
+                            data: data,
+                            borderColor: primaryColor,
+                            backgroundColor: `${primaryColor}15`,
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: primaryColor
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                backgroundColor: '#1f2937',
+                                titleColor: '#fff',
+                                bodyColor: '#9ca3af',
+                                borderColor: '#374151',
+                                borderWidth: 1,
+                                callbacks: {
+                                    label: (context) => `$${context.parsed.y.toFixed(2)}`
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { color: '#374151', drawBorder: false },
+                                ticks: { color: '#9ca3af', maxTicksLimit: 6 }
+                            },
+                            y: {
+                                grid: { color: '#374151', drawBorder: false },
+                                ticks: { 
+                                    color: '#9ca3af',
+                                    callback: (value) => `$${value}`
+                                }
+                            }
+                        },
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
+                        }
+                    }
+                });
+            }
+            
+            renderHeatMap(data) {
+                const container = document.getElementById('heatMap');
+                
+                container.innerHTML = data.map((value, index) => {
+                    const intensity = Math.floor(value);
+                    let bgClass;
+                    
+                    if (intensity < 33) {
+                        bgClass = 'bg-gradient-to-b from-blue-500/30 to-blue-600/20';
+                    } else if (intensity < 66) {
+                        bgClass = 'bg-gradient-to-b from-yellow-500/30 to-yellow-600/20';
+                    } else {
+                        bgClass = 'bg-gradient-to-b from-red-500/30 to-red-600/20';
+                    }
+                    
+                    return `
+                        <div class="heat-map-cell ${bgClass} rounded-lg cursor-pointer relative group hover:shadow-lg transition-all duration-300"
+                             title="Opportunity: ${intensity}%">
+                            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <span class="text-xs font-bold text-white">${intensity}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            renderBusinessPlan(planData) {
+                const container = document.getElementById('businessPlanProgress');
+                
+                container.innerHTML = Object.entries(planData).map(([section, progress]) => {
+                    let color;
+                    if (progress < 33) color = 'from-red-500 to-pink-500';
+                    else if (progress < 66) color = 'from-yellow-500 to-amber-500';
+                    else color = 'from-green-500 to-emerald-500';
+                    
+                    return `
+                        <div class="group">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-semibold group-hover:text-blue-300 transition-colors">${section}</span>
+                                <span class="text-sm font-bold bg-gradient-to-r ${color} bg-clip-text text-transparent">${progress}%</span>
+                            </div>
+                            <div class="w-full bg-gray-800/50 rounded-full h-2 overflow-hidden">
+                                <div class="h-full bg-gradient-to-r ${color} rounded-full transition-all duration-1000"
+                                     style="width: ${progress}%"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            applyGlowColor(color) {
+                EmpireState.empire.glowColor = color;
+                document.documentElement.style.setProperty('--glow-color', color);
+                
+                // Update chart if exists
+                if (EmpireState.charts.velocity) {
+                    EmpireState.charts.velocity.data.datasets[0].borderColor = color;
+                    EmpireState.charts.velocity.data.datasets[0].backgroundColor = `${color}15`;
+                    EmpireState.charts.velocity.update();
+                }
+                
+                EmpireState.save();
+            }
+            
+            // Chat System
+            async sendChatMessage() {
+                const input = document.getElementById('chatInput');
+                const message = input.value.trim();
+                
+                if (!message) return;
+                
+                // Add user message
+                this.addChatMessage(message, 'user');
+                input.value = '';
+                
+                // Show typing indicator
+                this.showTypingIndicator();
+                
+                // Generate AI response
+                setTimeout(() => {
+                    this.removeTypingIndicator();
+                    const response = this.generateAIResponse(message);
+                    this.addChatMessage(response, 'assistant');
+                    EmpireState.chatHistory.push({ role: 'user', content: message });
+                    EmpireState.chatHistory.push({ role: 'assistant', content: response });
+                }, 800 + Math.random() * 1200);
+            }
+            
+            addChatMessage(content, role) {
+                const container = document.getElementById('chatMessages');
+                const isUser = role === 'user';
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `chat-message ${isUser ? 'bg-blue-500/10 border-blue-500/20' : 'bg-gray-800/30 border-gray-700/50'} rounded-xl p-4 border`;
+                
+                if (!isUser) {
+                    messageDiv.innerHTML = `
+                        <div class="flex items-start gap-2 mb-3">
+                            <div class="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-brain text-white text-xs"></i>
+                            </div>
+                            <span class="text-xs font-semibold text-gray-300">Neural Strategist</span>
+                        </div>
+                    `;
+                }
+                
+                const contentP = document.createElement('p');
+                contentP.className = `text-sm whitespace-pre-wrap ${isUser ? 'text-blue-300' : 'text-gray-200'}`;
+                contentP.textContent = content;
+                messageDiv.appendChild(contentP);
+                
+                container.appendChild(messageDiv);
+                container.scrollTop = container.scrollHeight;
+            }
+            
+            showTypingIndicator() {
+                const container = document.getElementById('chatMessages');
+                const indicator = document.createElement('div');
+                indicator.id = 'typingIndicator';
+                indicator.className = 'chat-message bg-gray-800/30 border-gray-700/50 rounded-xl p-4 border';
+                indicator.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <div class="typing-indicator flex gap-1">
+                            <span class="inline-block w-2 h-2 bg-gray-500 rounded-full"></span>
+                            <span class="inline-block w-2 h-2 bg-gray-500 rounded-full"></span>
+                            <span class="inline-block w-2 h-2 bg-gray-500 rounded-full"></span>
+                        </div>
+                        <span class="text-xs text-gray-400">AI strategist thinking...</span>
+                    </div>
+                `;
+                container.appendChild(indicator);
+                container.scrollTop = container.scrollHeight;
+            }
+            
+            removeTypingIndicator() {
+                const indicator = document.getElementById('typingIndicator');
+                if (indicator) indicator.remove();
+            }
+            
+            generateAIResponse(userMessage) {
+                const industry = EmpireState.industries.find(i => i.id === EmpireState.empire.industry);
+                const lowerMessage = userMessage.toLowerCase();
+                
+                // Context-aware responses
+                if (lowerMessage.includes('idea') || lowerMessage.includes('business ideas')) {
+                    return `For the ${industry.name} sector, I'm detecting 3 high-potential opportunities:\n\n1. AI-driven ${industry.name.toLowerCase()} automation platform\n2. Sustainable ${industry.name.toLowerCase()} consulting service\n3. Mobile-first ${industry.name.toLowerCase()} marketplace\n\nCurrent market intelligence shows a ${EmpireState.intelligence[industry.id].stats.growth} growth rate with ${EmpireState.intelligence[industry.id].stats.opportunity} opportunity score.`;
+                }
+                
+                if (lowerMessage.includes('market') || lowerMessage.includes('size')) {
+                    return `Market Analysis for ${industry.name}:\n\n• Current Valuation: ${EmpireState.intelligence[industry.id].stats.marketSize}\n• Growth Rate: ${EmpireState.intelligence[industry.id].stats.growth}\n• Active Players: ${EmpireState.intelligence[industry.id].stats.competitors}\n• Market Maturity: ${EmpireState.intelligence[industry.id].stats.maturity}\n\nKey trends show digital transformation acceleration and increasing focus on sustainability.`;
+                }
+                
+                if (lowerMessage.includes('target') || lowerMessage.includes('audience')) {
+                    return `For ${EmpireState.empire.empireName} in ${industry.name}, I recommend targeting:\n\n• Primary: Tech-savvy professionals (25-45), urban centers\n• Secondary: Enterprise clients in growth phase\n• Geographic: Start with Tier-1 cities, expand to emerging markets\n\nPain points to address: inefficiency, scalability issues, and lack of integration.`;
+                }
+                
+                // Default intelligent response
+                return `Based on ${EmpireState.empire.empireName}'s current ${EmpireState.empire.stage} stage in ${industry.name}, I recommend focusing on:\n\n1. Market validation with minimum viable product\n2. Strategic partnerships in the ecosystem\n3. Data-driven customer acquisition\n4. Scalable operational infrastructure\n\nThe heat map shows concentrated opportunities in digital transformation segments.`;
+            }
+            
+            // Settings Management
+            openSettings() {
+                document.getElementById('settingsModal').classList.remove('hidden');
+                document.getElementById('codenameInput').value = EmpireState.empire.codename;
+                document.getElementById('empireNameInput').value = EmpireState.empire.empireName;
+                document.getElementById('businessStageSelect').value = EmpireState.empire.stage;
+                
+                // Populate industry select
+                const select = document.getElementById('primaryIndustrySelect');
+                select.innerHTML = '<option value="">Select Industry Focus</option>' + 
+                    EmpireState.industries.map(i => 
+                        `<option value="${i.id}" ${i.id === EmpireState.empire.industry ? 'selected' : ''}>${i.icon} ${i.name}</option>`
+                    ).join('');
+            }
+            
+            closeSettings() {
+                document.getElementById('settingsModal').classList.add('hidden');
+            }
+            
+            saveSettings() {
+                EmpireState.empire.codename = document.getElementById('codenameInput').value || 'Strategist';
+                EmpireState.empire.empireName = document.getElementById('empireNameInput').value || 'Empire Architect';
+                EmpireState.empire.stage = document.getElementById('businessStageSelect').value;
+                
+                const selectedIndustry = document.getElementById('primaryIndustrySelect').value;
+                if (selectedIndustry) {
+                    EmpireState.empire.industry = selectedIndustry;
+                }
+                
+                EmpireState.save();
+                this.closeSettings();
+                this.renderDashboard();
+            }
+        }
+
+        // ========================================
+        // UTILITY FUNCTIONS
+        // ========================================
+
+        function showToast(message) {
+            const toast = document.getElementById('successToast');
+            const messageEl = document.getElementById('toastMessage');
+            
+            messageEl.textContent = message;
+            toast.classList.remove('hidden');
+            
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        // ========================================
+        // INITIALIZATION
+        // ========================================
+
+        // Create global app instance
+        window.app = new EmpireArchitect();
+
+        // Real-time intelligence updates
+        setInterval(() => {
+            if (!document.getElementById('dashboard').classList.contains('hidden')) {
+                // Update heat map with subtle changes
+                const currentData = EmpireState.intelligence[EmpireState.empire.industry];
+                currentData.heatMap = currentData.heatMap.map(val => 
+                    Math.max(0, Math.min(100, val + (Math.random() - 0.5) * 5))
+                );
+                app.renderHeatMap(currentData.heatMap);
+                
+                // Update stats slightly
+                const stats = currentData.stats;
+                stats.marketSize = `$${(parseFloat(stats.marketSize.slice(1, -1)) + (Math.random() - 0.5)).toFixed(1)}B`;
+                app.renderStats(stats);
+            }
+        }, 15000);
+
+        console.log('🎯 Empire Architect System Ready');
+        console.log('🔐 Neural Authentication: Active');
+        console.log('🧠 AI Intelligence: Online');
+        console.log('💾 Auto-save: Enabled');
+    </script>
+</body>
+</html>
